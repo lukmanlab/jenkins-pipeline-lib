@@ -42,7 +42,8 @@ class DockerPushStage implements PipelineStage, Serializable {
     }
 
     private def pushWithServiceAccount(String tag, Map config) {
-        script.sh "gcloud auth configure-docker --impersonate-service-account=${config.gcrServiceAccount}"
+        script.sh "gcloud config set auth/impersonate_service_account ${config.gcrServiceAccount}"
+        script.sh "gcloud auth configure-docker ${config.dockerRegistry}"
         script.sh "docker push ${tag}"
     }
 }

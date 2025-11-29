@@ -10,7 +10,7 @@ class DockerPushStage implements PipelineStage, Serializable {
     }
 
     def execute(Map config) {
-        def tag = "${config.dockerRegistry}/${config.projectName}:${config.imageTag}"
+        def tag = "${config.dockerRegistry}/${config.registryNamespace}/${config.projectName}:${config.imageTag}"
         script.echo "Pushing Docker image: ${tag}"
 
         if (config.dockerCredentials) {

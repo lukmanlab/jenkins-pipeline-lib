@@ -45,5 +45,8 @@ class DockerPushStage implements PipelineStage, Serializable {
         script.sh "gcloud config set auth/impersonate_service_account ${config.gcrServiceAccount}"
         script.sh "gcloud auth configure-docker ${config.dockerRegistry}"
         script.sh "docker push ${tag}"
+
+        // remove the image in local after success push
+        script.sh "docker rmi ${tag}"
     }
 }

@@ -1,6 +1,6 @@
 import pipelines.core.PipelineOrchestrator
-import pipelines.notifications.Notifier
 import pipelines.factory.StageFactory
+import pipelines.notifications.EmailNotifier
 
 def call(Map config) {
     // Initialize orchestrator
@@ -14,7 +14,7 @@ def call(Map config) {
 
     // Register notifiers
     if (config.emailNotifications) {
-        orchestrator.addNotifier(new EmailNotifier(this, config.emailRecipient as String) as Notifier)
+        orchestrator.addNotifier(new EmailNotifier(this, config.emailRecipient as String))
     }
 
     pipeline {

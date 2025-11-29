@@ -12,7 +12,7 @@ class CheckoutStage implements Serializable {
         script.checkout([
                 $class: 'GitSCM',
                 branches: [[ name: config.branch ?: '*/main' ]],
-                userRemoteConfig: [[ url: config.repOurl ]]
+                userRemoteConfigs: [[ url: config.repoUrl ]]
         ])
     }
 }

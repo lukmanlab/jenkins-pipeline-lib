@@ -27,8 +27,8 @@ def call(Map config) {
         }
 
         environment {
-            PROJECT_NAME = config.projectName
-            ENVIRONMENT = config.environment ?: 'dev'
+            PROJECT_NAME = "${config.projectName}"
+            ENVIRONMENT = "${config.environment ?: 'dev'}"
             BUILD_VERSION = "${env.BUILD_NUMBER}"
         }
 

@@ -1,6 +1,8 @@
 package pipelines.stages
 
-class CheckoutStage implements Serializable {
+import pipelines.core.PipelineStage
+
+class CheckoutStage implements PipelineStage, Serializable {
     private def script
 
     CheckoutStage(script) {

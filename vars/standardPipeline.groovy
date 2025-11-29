@@ -44,6 +44,17 @@ def call(Map config) {
                 }
             }
 
+            stage('GCP Authentication') {
+                when {
+                    expression { config.stages.contains('gcpauth') }
+                }
+                steps {
+                    script {
+                        orchestrator.executeStage('gcpauth', config)
+                    }
+                }
+            }
+
             stage('Build') {
                 when {
                     expression {

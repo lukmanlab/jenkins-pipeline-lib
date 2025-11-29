@@ -13,15 +13,17 @@ class StageFactory implements Serializable {
     PipelineStage createStage(String type) {
         switch(type.toLowerCase()) {
             case 'checkout':
-                return new CheckoutStage(script) as PipelineStage
+                return new CheckoutStage(script)
+            case 'gcpauth':
+                return new GCPAuthenticationStage(script)
             case 'build':
-                return new BuildStage(script) as PipelineStage
+                return new BuildStage(script)
             case 'dockerbuild':
-                return new DockerBuildStage(script) as PipelineStage
+                return new DockerBuildStage(script)
             case 'dockerpush':
-                return new DockerPushStage(script) as PipelineStage
+                return new DockerPushStage(script)
             case 'deploy':
-                return new DeployStage(script) as PipelineStage
+                return new DeployStage(script)
             default:
                 throw new IllegalArgumentException("Unknown stage type: ${type}")
         }

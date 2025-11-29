@@ -1,6 +1,8 @@
 package pipelines.stages
 
-class DeployStage implements Serializable {
+import pipelines.core.PipelineStage
+
+class DeployStage implements PipelineStage, Serializable {
     private def script
 
     DeployStage(script) {

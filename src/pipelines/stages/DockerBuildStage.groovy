@@ -10,7 +10,7 @@ class DockerBuildStage implements PipelineStage, Serializable {
     }
 
     def execute(Map config) {
-        def tag = "${config.dockerRegistry}/${config.imageName}:${config.imageTag}"
+        def tag = "${config.dockerRegistry}/${config.projectName}:${config.imageTag}"
         script.echo "Building Docker image: ${tag}"
         script.sh "docker build -t ${tag} ."
     }

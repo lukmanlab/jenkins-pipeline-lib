@@ -5,6 +5,8 @@ class Common implements Serializable {
         switch (config.environment) {
             case 'master':
                 // fallthrough
+            case 'staging':
+                // fallthrough
             case 'main':
                 return 'staging'
                 break

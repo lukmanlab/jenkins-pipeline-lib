@@ -29,9 +29,10 @@ class DeployStage implements PipelineStage, Serializable {
 
             script.sh "kustomize build ${kustomizeDir} > service.yaml"
             script.sh """
-                sed "s#${config.searchTextToReplace}#${tag}#g" service.yaml > service.yaml.rendered
+                sed "s#${config.searchImageToReplace}#${tag}#g; s#${config.searchSaToReplace}#${config.deployServiceAccount}#g" service.yaml > service.yaml.rendered
             """
-            script.sh "${result.command} ${result.options}"
+            script.sh "${result.command} replace ${result.options}"
+            script.sh "${result.command} update ${additionalOptions}"
 
         } else if (result.platform == 'gcp_cloud_run') {
             script.sh "${result.command} ${config.projectName} ${result.options} ${serviceAccountOpt} ${additionalOptions}"

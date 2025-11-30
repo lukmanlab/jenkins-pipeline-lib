@@ -16,8 +16,9 @@ class DockerBuildStage implements PipelineStage, Serializable {
         def env = Common.buildEnvironment(config)
         def dockerFile = env == 'production' ? 'Dockerfile.production' : 'Dockerfile.staging'
         def dockerFileOption = config.useEnvDockerfile == 'true' ? "-f ${dockerFile}" : ''
+        def dockerBuildArgs = config.dockerBuildArgs ?: ''
 
         script.echo "Building Docker image: ${tag}"
-        script.sh "docker build ${dockerFileOption} -t ${tag} ."
+        script.sh "docker build ${dockerFileOption} ${dockerBuildArgs} -t ${tag} ."
     }
 }

@@ -4,87 +4,38 @@
 @Library('shared-pipeline-library') _
 
 standardPipeline(
-    projectName: 'my-java-app',
-    environment: 'dev',
-    stages: ['checkout', 'maven', 'test'],
-    timeout: 30,
+        projectName: "${env.JOB_BASE_NAME}",
+        environment: "${params.BRANCH_NAME}",
+        stages: ['checkout', 'gcpauth', 'dockerbuild', 'dockerpush', 'deploy'],
+        timeout: 30,
 
-    repoUrl: 'https://github.com/myorg/my-java-app.git',
-    branch: '*/develop',
-    mavenArgs: '-DskipTests=false',
-    testCommand: 'mvn test',
-    publishTestResults: true,
-    
-    emailNotifications: true,
-    emailRecipient: 'dev-team@example.com'
+        // CHECKOUT REPO
+        githubCredentialId: 'github-pat',
+        repoUrl: "https://github.com/exampleorg/${env.JOB_BASE_NAME}.git",
+        branch: "${params.BRANCH_NAME}", // default branch is main (if not set)
+
+        // AUTH GCP
+        gcpServiceAccount: 'ci-cd-jenkins',
+        /** gcpProjectId is a destination gcp projectId to store the artifact or to autenticate for specific projectId
+         If this is configured, the push stage using this projectId
+         */
+        gcpProjectId: 'exampleorg-shared',
+
+        // BUILD & PUSH
+        // dockerRegistry: 'asia-southeast2-docker.pkg.dev', // default is asia-southeast2-docker.pkg.dev (if not set)
+        useEnvDockerfile: 'true',
+        dockerBuildArgs: '--build-arg environment=staging', // default is '' (if not set)
+        registryNamespace: 'exampleorg-shared/exampleorg',
+        imageTag: "${env.BUILD_NUMBER}",
+        gcrServiceAccount: 'artifact-registry@exampleorg-shared.iam.gserviceaccount.com',
+
+        // DEPLOYMENT
+        deployTo: 'gcp_cloud_run_kustomize',
+        deployGcpProjectId: 'exampleorg-staging',
+        deployServiceAccount: 'cloud-run@exampleorg-staging.iam.gserviceaccount.com',
+        imagePlaceholder: 'REPLACE_BUILD_JENKINS',
+
+        // FINAL OPTIONS
+        alwaysRemoveImage: 'true'
 )
-```
-
-// Example 2: Full CI/CD with Docker
-- Jenkinsfile
-```groovy
-@Library('shared-pipeline-library') _
-
-standardPipeline(
-    projectName: 'my-microservice',
-    environment: 'production',
-    stages: ['checkout', 'gradle', 'test', 'sonar', 'dockerbuild', 'dockerpush', 'deploy'],
-    timeout: 45,
-
-    repoUrl: 'https://github.com/myorg/microservice.git',
-    branch: '*/main',
-    
-    gradleArgs: '--no-daemon',
-    testCommand: './gradlew test',
-    publishTestResults: true,
-    
-    sonarServer: 'SonarQube',
-    waitForQualityGate: true,
-    
-    dockerRegistry: 'registry.example.com',
-    imageName: 'my-microservice',
-    imageTag: "${env.BUILD_NUMBER}",
-    dockerCredentials: 'docker-hub-credentials',
-    
-    deployCommand: 'kubectl apply -f k8s/deployment.yaml',
-    
-    emailNotifications: true,
-    emailRecipient: 'ops-team@example.com',
-    slackNotifications: true,
-    slackChannel: '#deployments'
-)
-```
-// Example 3: Multi-environment deployment
-- Jenkinsfile
-```groovy
-@Library('shared-pipeline-library') _
-
-def deployToEnv(env) {
-    standardPipeline(
-        projectName: 'my-app',
-        environment: env,
-        stages: ['checkout', 'maven', 'test', 'dockerbuild', 'dockerpush', 'deploy'],
-
-        repoUrl: 'https://github.com/myorg/my-app.git',
-        branch: env == 'prod' ? '*/main' : '*/develop',
-        
-        dockerRegistry: 'registry.example.com',
-        imageName: "my-app-${env}",
-        imageTag: "${env}-${env.BUILD_NUMBER}",
-        dockerCredentials: 'docker-credentials',
-        
-        deployCommand: "helm upgrade --install my-app ./helm --set environment=${env}",
-        
-        slackNotifications: true,
-        slackChannel: "#${env}-deployments"
-    )
-}
-
-// Deploy based on branch
-if (env.BRANCH_NAME == 'main') {
-    deployToEnv('prod')
-} else if (env.BRANCH_NAME == 'develop') {
-    deployToEnv('dev')
-}
-
 ```

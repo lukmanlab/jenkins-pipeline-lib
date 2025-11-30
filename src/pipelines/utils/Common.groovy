@@ -16,4 +16,24 @@ class Common implements Serializable {
                 break
         }
     }
+
+    static Map getCommandPlatformDeployment(Map config) {
+        def tag = Docker.buildTag(config)
+        def region = config.region ?: 'asia-southeast2'
+
+        switch (config.deployTo) {
+            case 'gcp_cloud_run':
+                return [
+                    platform: 'gcp_cloud_run',
+                    command : 'gcloud run deploy',
+                    options : "--image=${tag} --platform=managed --region=${region} --allow-unauthenticated"
+                ]
+            default:
+                return [
+                    platform: '',
+                    command : '',
+                    options: ''
+                ]
+        }
+    }
 }

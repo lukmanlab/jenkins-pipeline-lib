@@ -43,10 +43,10 @@ class PipelineOrchestrator implements Serializable {
 
     def removeDockerImage(Map config) {
         def tag = Docker.buildTag(config)
-        if (config.alwaysRemoveImage) {
+        if (config.alwaysRemoveImage == 'true') {
             script.sh "docker rmi ${tag}"
         } else {
-            script.echo "Doesn't remove image because the 'alwaysRemoveImage' not set"
+            script.echo "Doesn't remove image because the 'alwaysRemoveImage' not set or false"
         }
     }
 }

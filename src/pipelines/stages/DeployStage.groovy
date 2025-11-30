@@ -2,6 +2,7 @@ package pipelines.stages
 
 import pipelines.core.PipelineStage
 import pipelines.utils.Common
+import pipelines.utils.Docker
 
 class DeployStage implements PipelineStage, Serializable {
     private def script
@@ -17,10 +18,26 @@ class DeployStage implements PipelineStage, Serializable {
 
         script.echo "Deploying to ${config.environment} ${result.platform}"
 
-        if (result.platform == 'gcp_cloud_run' && config.deployServiceAccount) {
+        if (config.deployServiceAccount) {
             script.sh "gcloud config set auth/impersonate_service_account ${config.deployServiceAccount}"
         }
 
-        script.sh "${result.command} ${config.projectName} ${result.options} ${serviceAccountOpt} ${additionalOptions}"
+        if (result.platform == 'gcp_cloud_run_kustomize') {
+            def env = Common.buildEnvironment(config)
+            def tag = Docker.buildTag(config)
+            def kustomizeDir = env == 'production' ? 'deploy/cloudrun/overlays/production' : 'deploy/cloudrun/overlays/development'
+
+            script.sh "kustomize build ${kustomizeDir} > service.yaml"
+            script.sh """
+                sed 's#${config.searchTextToReplace}#${tag}#g' service.yaml > service.yaml.rendered
+            """
+            script.sh "${result.command} ${result.options}"
+
+        } else if (result.platform == 'gcp_cloud_run') {
+            script.sh "${result.command} ${config.projectName} ${result.options} ${serviceAccountOpt} ${additionalOptions}"
+
+        } else {
+            script.sh "platform not supported"
+        }
     }
 }

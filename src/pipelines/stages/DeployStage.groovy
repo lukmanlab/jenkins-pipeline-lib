@@ -32,7 +32,10 @@ class DeployStage implements PipelineStage, Serializable {
                 sed "s#${config.searchImageToReplace}#${tag}#g; s#${config.searchSaToReplace}#${config.deployServiceAccount}#g; s#${config.searchNetworkToReplace}#${config.cloudRunNetworkInterface}#g;" service.yaml > service.yaml.rendered
             """
             script.sh "${result.command} replace ${result.options}"
-            script.sh "${result.command} update ${config.projectName} ${additionalOptions}"
+
+            if (config.additionalOptions) {
+                script.sh "${result.command} update ${config.projectName} ${additionalOptions}"
+            }
 
         } else if (result.platform == 'gcp_cloud_run') {
             script.sh "${result.command} ${config.projectName} ${result.options} ${serviceAccountOpt} ${additionalOptions}"

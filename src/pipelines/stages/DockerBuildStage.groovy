@@ -1,6 +1,7 @@
 package pipelines.stages
 
 import pipelines.core.PipelineStage
+import pipelines.utils.Common
 import pipelines.utils.Docker
 
 class DockerBuildStage implements PipelineStage, Serializable {
@@ -12,7 +13,11 @@ class DockerBuildStage implements PipelineStage, Serializable {
 
     def execute(Map config) {
         def tag = Docker.buildTag(config)
+        def env = Common.buildEnvironment(config)
+        def dockerFile = env == 'production' ? 'Dockerfile.production' : 'Dockerfile.staging'
+        def dockerFileOption = config.useEnvDockerfile == 'true' ? "-f ${dockerFile}" : ''
+
         script.echo "Building Docker image: ${tag}"
-        script.sh "docker build -t ${tag} ."
+        script.sh "docker build ${dockerFileOption} -t ${tag} ."
     }
 }

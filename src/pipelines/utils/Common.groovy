@@ -26,7 +26,7 @@ class Common implements Serializable {
                 return [
                     platform: 'gcp_cloud_run',
                     command : 'gcloud run deploy',
-                    options : "--image=${tag} --platform=managed --region=${region} --allow-unauthenticated"
+                    options : "--image=${tag} --platform=managed --region=${region} --project=${config.deployGcpProjectId} --allow-unauthenticated"
                 ]
             default:
                 return [

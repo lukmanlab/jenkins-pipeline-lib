@@ -21,7 +21,7 @@ class Common implements Serializable {
 
     static Map getCommandPlatformDeployment(Map config) {
         def tag = Docker.buildTag(config)
-        def region = config.region ?: 'asia-southeast2'
+        def region = getRegion(config)
 
         switch (config.deployTo) {
             case 'gcp_cloud_run':
@@ -43,5 +43,10 @@ class Common implements Serializable {
                     options: ''
                 ]
         }
+    }
+
+    static String getRegion(Map config) {
+        def region = config.region ?: 'asia-southeast2'
+        return region
     }
 }

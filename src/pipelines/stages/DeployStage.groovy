@@ -13,8 +13,6 @@ class DeployStage implements PipelineStage, Serializable {
 
     def execute(Map config) {
         def result = Common.getCommandPlatformDeployment(config)
-        def additionalOptions = config.additionalOptions ?: ''
-        def serviceAccountOpt = config.deployServiceAccount ? "--service-account=${config.deployServiceAccount}" : ''
 
         script.echo "Deploying to ${config.environment} ${result.platform}"
 
@@ -25,20 +23,15 @@ class DeployStage implements PipelineStage, Serializable {
         if (result.platform == 'gcp_cloud_run_kustomize') {
             def env = Common.buildEnvironment(config)
             def tag = Docker.buildTag(config)
-            def kustomizeDir = env == 'production' ? 'deploy/cloudrun/overlays/production' : 'deploy/cloudrun/overlays/development'
+            def kustomizeDir = env == 'production' ? 'deploy/cloudrun/migration/overlays/production' : 'deploy/cloudrun/migration/overlays/development'
 
             script.sh "kustomize build ${kustomizeDir} > service.yaml"
+
             script.sh """
-                sed "s#${config.searchImageToReplace}#${tag}#g; s#${config.searchSaToReplace}#${config.deployServiceAccount}#g; s#${config.searchNetworkToReplace}#${config.cloudRunNetworkInterface}#g;" service.yaml > service.yaml.rendered
+                sed "s#${config.imagePlaceholder}#${tag}#g" service.yaml > service.yaml.rendered
             """
-            script.sh "${result.command} replace ${result.options}"
 
-            if (config.additionalOptions) {
-                script.sh "${result.command} update ${config.projectName} ${additionalOptions}"
-            }
-
-        } else if (result.platform == 'gcp_cloud_run') {
-            script.sh "${result.command} ${config.projectName} ${result.options} ${serviceAccountOpt} ${additionalOptions}"
+            script.sh "${result.command} ${result.options}"
 
         } else {
             script.sh "platform not supported"

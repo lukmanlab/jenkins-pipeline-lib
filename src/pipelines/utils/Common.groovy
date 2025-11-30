@@ -20,20 +20,13 @@ class Common implements Serializable {
     }
 
     static Map getCommandPlatformDeployment(Map config) {
-        def tag = Docker.buildTag(config)
         def region = getRegion(config)
 
         switch (config.deployTo) {
-            case 'gcp_cloud_run':
-                return [
-                    platform: 'gcp_cloud_run',
-                    command : 'gcloud run deploy',
-                    options : "--image=${tag} --platform=managed --region=${region} --project=${config.deployGcpProjectId} --allow-unauthenticated"
-                ]
             case 'gcp_cloud_run_kustomize':
                 return [
                     platform: 'gcp_cloud_run_kustomize',
-                    command: 'gcloud run services',
+                    command: 'gcloud run services replace',
                     options: "service.yaml.rendered --region=${region} --project=${config.deployGcpProjectId}"
                 ]
             default:

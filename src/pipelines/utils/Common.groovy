@@ -33,7 +33,7 @@ class Common implements Serializable {
             case 'gcp_cloud_run_kustomize':
                 return [
                     platform: 'gcp_cloud_run_kustomize',
-                    command: 'gcloud run service replace',
+                    command: 'gcloud run services replace',
                     options: "service.yaml.rendered --region=${region} --project=${config.deployGcpProjectId}"
                 ]
             default:

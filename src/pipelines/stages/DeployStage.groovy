@@ -29,7 +29,7 @@ class DeployStage implements PipelineStage, Serializable {
 
             script.sh "kustomize build ${kustomizeDir} > service.yaml"
             script.sh """
-                sed "s#${config.searchImageToReplace}#${tag}#g; s#${config.searchSaToReplace}#${config.deployServiceAccount}#g" service.yaml > service.yaml.rendered
+                sed "s#${config.searchImageToReplace}#${tag}#g; s#${config.searchSaToReplace}#${config.deployServiceAccount}#g; s#${config.searchNetworkToReplace}#${config.cloudRunNetworkInterface}#g;" service.yaml > service.yaml.rendered
             """
             script.sh "${result.command} replace ${result.options}"
             script.sh "${result.command} update ${additionalOptions}"

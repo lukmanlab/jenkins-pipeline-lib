@@ -124,6 +124,7 @@ def call(Map config) {
                 }
             }
             always {
+                orchestrator.removeDockerImage(config)
                 cleanWs()
             }
         }

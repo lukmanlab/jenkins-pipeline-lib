@@ -1,6 +1,7 @@
 package pipelines.stages
 
 import pipelines.core.PipelineStage
+import pipelines.utils.Docker
 
 class DockerPushStage implements PipelineStage, Serializable {
     private def script
@@ -10,7 +11,7 @@ class DockerPushStage implements PipelineStage, Serializable {
     }
 
     def execute(Map config) {
-        def tag = "${config.dockerRegistry}/${config.registryNamespace}/${config.projectName}:${config.imageTag}"
+        def tag = Docker.buildTag(config)
         script.echo "Pushing Docker image: ${tag}"
 
         if (config.dockerCredentials) {
@@ -45,8 +46,5 @@ class DockerPushStage implements PipelineStage, Serializable {
         script.sh "gcloud config set auth/impersonate_service_account ${config.gcrServiceAccount}"
         script.sh "gcloud auth configure-docker ${config.dockerRegistry}"
         script.sh "docker push ${tag}"
-
-        // remove the image in local after success push
-        script.sh "docker rmi ${tag}"
     }
 }

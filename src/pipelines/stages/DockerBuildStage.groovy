@@ -1,6 +1,7 @@
 package pipelines.stages
 
 import pipelines.core.PipelineStage
+import pipelines.utils.Docker
 
 class DockerBuildStage implements PipelineStage, Serializable {
     private def script
@@ -10,7 +11,7 @@ class DockerBuildStage implements PipelineStage, Serializable {
     }
 
     def execute(Map config) {
-        def tag = "${config.dockerRegistry}/${config.registryNamespace}/${config.projectName}:${config.imageTag}"
+        def tag = Docker.buildTag(config)
         script.echo "Building Docker image: ${tag}"
         script.sh "docker build -t ${tag} ."
     }

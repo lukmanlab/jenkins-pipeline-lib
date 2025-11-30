@@ -1,6 +1,7 @@
 package pipelines.core
 
 import pipelines.notifications.Notifier
+import pipelines.utils.Docker
 
 class PipelineOrchestrator implements Serializable {
     private def script
@@ -38,5 +39,10 @@ class PipelineOrchestrator implements Serializable {
                 script.echo "There is error in notification process: ${e.message}"
             }
         }
+    }
+
+    def removeDockerImage(Map config) {
+        def tag = Docker.buildTag(config)
+        script.sh "docker rmi ${tag}"
     }
 }

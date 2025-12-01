@@ -1,4 +1,3 @@
-// Example 1: Simple Maven Project
 - Jenkinsfile
 ```groovy
 @Library('shared-pipeline-library') _

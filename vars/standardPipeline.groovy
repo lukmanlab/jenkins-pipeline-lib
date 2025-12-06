@@ -126,6 +126,7 @@ def call(Map config) {
             always {
                 script {
                     orchestrator.removeDockerImage(config)
+                    orchestrator.unsetImpersonateSa(config)
                 }
                 cleanWs()
             }

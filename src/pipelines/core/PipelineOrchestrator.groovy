@@ -49,4 +49,10 @@ class PipelineOrchestrator implements Serializable {
             script.echo "Doesn't remove image because the 'alwaysRemoveImage' not set or false"
         }
     }
+
+    def unsetImpersonateSa(Map config) {
+        if (config.gcpServiceAccount || config.deployServiceAccount) {
+            script.sh "gcloud config unset auth/impersonate_service_account"
+        }
+    }
 }

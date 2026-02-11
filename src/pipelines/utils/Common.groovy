@@ -13,6 +13,9 @@ class Common implements Serializable {
             case 'production':
                 return 'production'
                 break
+            case 'migration-prod':
+                return 'production'
+                break
             default:
                 return 'staging'
                 break

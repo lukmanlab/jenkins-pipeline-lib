@@ -23,7 +23,7 @@ class DeployStage implements PipelineStage, Serializable {
         if (result.platform == 'gcp_cloud_run_kustomize') {
             def env = Common.buildEnvironment(config)
             def tag = Docker.buildTag(config)
-            def kustomizeDir = env == 'production' ? 'deploy/cloudrun/migration/overlays/production' : 'deploy/cloudrun/migration/overlays/development'
+            def kustomizeDir = env == 'production' ? 'deploy/cloudrun/overlays/production' : 'deploy/cloudrun/overlays/development'
 
             script.sh "kustomize build ${kustomizeDir} > service.yaml"
 
